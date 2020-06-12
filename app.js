@@ -9,6 +9,8 @@ const { getElementById, getIndexById, updateElement,
 
 const expressions = [];
 seedElements(expressions, 'expressions');
+const animals = [];
+seedElements(animals, 'animals');
 
 const PORT = process.env.PORT || 4001;
 // Use static server to serve the Express Yourself Website
@@ -47,21 +49,60 @@ app.post('/expressions', (req, res, next) => {
   }
 });
 
-// Add your DELETE handler below:
-app.delete('/expressions/:id', (req, res, next)=>{
-  const ind = getIndexById(req.params.id, expressions);
-  if(ind !== -1){
-    expressions.splice(ind, 1);
+app.delete('/expressions/:id', (req, res, next) => {
+  const expressionIndex = getIndexById(req.params.id, expressions);
+  if (expressionIndex !== -1) {
+    expressions.splice(expressionIndex, 1);
     res.status(204).send();
+  } else {
+    res.status(404).send();
+  }
+});
+
+app.get("/animals", (req, res, next)=>{
+  res.send(animals);
+});
+
+app.get("/animals/:id", (req, res, next)=>{
+  const indexOfId = getIndexById(req.params.id, animals);
+  if(indexOfId !== -1){
+    const foundAnimal = getElementById(req.params.id, animals);
+    res.send(foundAnimal);
   } else{
+    req.status(404).send();
+  }  
+});
+
+app.put("/animals/:id", (req, res, next)=>{
+  const indexOfId = getIndexById(req.params.id, animals);
+  if(indexOfId !== -1){
+    updateElement(req.params.id, req.query, animals);
+    res.send(animals[indexOfId]);
+  } else{
+    res.status(404).send();
+  }  
+});
+
+app.post("/animals", (req, res, next)=>{
+  const receivedAnimal = createElement('animals', req.query);
+  if (receivedAnimal) {
+    animals.push(receivedAnimal);
+    res.status(201).send(receivedAnimal);
+  } else {
+    res.status(400).send();
+  }
+});
+
+app.delete('/animals/:id', (req, res, next) => {
+  const animalIndex = getIndexById(req.params.id, animals);
+  if (animalIndex !== -1) {
+    animals.splice(animalIndex, 1);
+    res.status(204).send();
+  } else {
     res.status(404).send();
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+  console.log(`Listening on port ${PORT}`); 
 });
-
-
-
-
